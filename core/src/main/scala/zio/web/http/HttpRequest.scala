@@ -65,4 +65,16 @@ object HttpRequest {
         r <- right.run(method, uri, headers)
       } yield (l, r)
   }
+
+  def fold[Z](request: HttpRequest[_], z: Z)(pf: PartialFunction[(Z, HttpRequest[_]), Z]): Z =
+    request match {
+      case Map(request, _)           => fold(request, z)(pf)
+      case OrElseEither(left, right) => fold(right, fold(left, z)(pf))(pf)
+      case Zip(left, right)          => fold(right, fold(left, z)(pf))(pf)
+      case request                   => pf.applyOrElse[(Z, HttpRequest[_]), Z]((z, request), _ => z)
+    }
+
+  def headers[A](request: HttpRequest[A]): List[String] = fold(request, List.empty[String]) {
+    case (headers, HttpRequest.Header(name)) => headers ++ List(name)
+  }
 }
