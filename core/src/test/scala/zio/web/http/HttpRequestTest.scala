@@ -15,7 +15,7 @@ object HttpRequestTest extends DefaultRunnableSpec {
           HttpRequest.Header("content-length")
         )
 
-        assert(HttpRequest.headers(request))(equalTo(List("content-type", "content-length")))
+        assert(request.headers)(equalTo(List("content-type", "content-length")))
       },
       test("headers with orElseEither") {
 
@@ -24,7 +24,7 @@ object HttpRequestTest extends DefaultRunnableSpec {
           HttpRequest.Header("content-length")
         )
 
-        assert(HttpRequest.headers(request))(equalTo(List("content-type", "content-length")))
+        assert(request.headers)(equalTo(List("content-type", "content-length")))
       },
       test("custom fold with orElseEither") {
 
@@ -37,7 +37,7 @@ object HttpRequestTest extends DefaultRunnableSpec {
             HttpRequest.Header("content-length3")
           )
 
-        val result = HttpRequest.fold(request, List.empty[String]) {
+        val result = request.fold(List.empty[String]) {
           case (headers, HttpRequest.Header(name)) if name != "content-length" =>
             headers ++ List(name)
         }
